@@ -1,0 +1,62 @@
+# Set this server's root to the repository directory, enable HTTPS separately,
+# and configure the correct PHP 8.4 FPM socket. Do not use this snippet unchanged.
+server {
+    listen 443 ssl;
+    server_name note.example.com;
+    root /var/www/shiji;
+    index index.php;
+    # ssl_certificate /path/to/fullchain.pem;
+    # ssl_certificate_key /path/to/privkey.pem;
+    client_max_body_size 22m;
+    add_header X-Content-Type-Options nosniff always;
+    add_header X-Frame-Options DENY always;
+    add_header Referrer-Policy same-origin always;
+
+    location ~ ^/(?:index\.php/)?login/v2(?:/poll|/flow/[a-f0-9]{64})?/?$ {
+        access_log off;
+        include fastcgi_params;
+        fastcgi_param SCRIPT_FILENAME $document_root/NextcloudAPI/index.php;
+        fastcgi_param HTTPS on;
+        fastcgi_pass unix:/run/php/php8.4-fpm.sock;
+    }
+
+    location ~ ^/(?:(?:NextcloudAPI/)?status\.php|(?:index\.php/)?apps/notes/api/v(?:1|0\.2)/(?:notes(?:/[1-9][0-9]*)?|settings)/?|ocs/v[12]\.php/cloud/capabilities/?|NextcloudAPI/(?:index\.php)?)$ {
+        include fastcgi_params;
+        fastcgi_param SCRIPT_FILENAME $document_root/NextcloudAPI/index.php;
+        fastcgi_param HTTP_AUTHORIZATION $http_authorization;
+        fastcgi_param HTTPS on;
+        fastcgi_pass unix:/run/php/php8.4-fpm.sock;
+    }
+    location /NextcloudAPI/ { deny all; }
+
+    location ~ ^/(?:app|config|storage|database|scripts|tests|docs|deploy)(?:/|$) { deny all; }
+    location ~ /\. { deny all; }
+    location ~* \.(?:md|sql|log|ini|env)$ { deny all; }
+    # Suppress access logs on short-code and anonymous endpoint routes.
+    location ~ ^/[0-9]{6}/?$ {
+        access_log off;
+        rewrite ^/([0-9]{6})/?$ /anonymous.php?code=$1 last;
+    }
+    location = /anonymous.php {
+        access_log off;
+        include fastcgi_params;
+        fastcgi_param SCRIPT_FILENAME $document_root/anonymous.php;
+        fastcgi_param HTTPS on;
+        fastcgi_pass unix:/run/php/php8.4-fpm.sock;
+    }
+    location = /api.php {
+        access_log off;
+        include fastcgi_params;
+        fastcgi_param SCRIPT_FILENAME $document_root/api.php;
+        fastcgi_param HTTPS on;
+        fastcgi_pass unix:/run/php/php8.4-fpm.sock;
+    }
+    location ~ ^/(?:index|login|install|attachment)\.php$ {
+        include fastcgi_params;
+        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+        fastcgi_param HTTPS on;
+        fastcgi_pass unix:/run/php/php8.4-fpm.sock;
+    }
+    location ~ \.php$ { deny all; }
+    location / { try_files $uri $uri/ =404; }
+}

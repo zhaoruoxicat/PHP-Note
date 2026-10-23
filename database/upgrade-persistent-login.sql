@@ -1,0 +1,26 @@
+CREATE TABLE IF NOT EXISTS browser_devices (
+ user_id BIGINT UNSIGNED NOT NULL,
+ device_hash CHAR(64) NOT NULL,
+ session_id BIGINT UNSIGNED NOT NULL,
+ PRIMARY KEY (user_id, device_hash),
+ FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+ FOREIGN KEY (session_id) REFERENCES auth_sessions(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS login_audit (
+ id BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+ user_id BIGINT UNSIGNED NOT NULL,
+ session_id BIGINT UNSIGNED NULL,
+ login_ip VARCHAR(45) NOT NULL,
+ location_json JSON NULL,
+ created_at DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
+ KEY user_logins (user_id, created_at),
+ FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+ FOREIGN KEY (session_id) REFERENCES auth_sessions(id) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS ip_geo_cache (
+ ip VARCHAR(45) PRIMARY KEY,
+ location_json JSON NOT NULL,
+ expires_at DATETIME(6) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

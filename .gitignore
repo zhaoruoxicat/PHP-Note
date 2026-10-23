@@ -1,0 +1,39 @@
+# Private configuration and installation state
+/config/config.php
+/config/ip.php
+/config/.install-*
+/config/installed.lock
+.env
+.env.*
+!.env.example
+
+# Uploaded files and application data
+/storage/*
+!/storage/.htaccess
+!/storage/.gitkeep
+
+# Logs, release packages, database backups and private keys
+*.log
+*.zip
+*.tar
+*.tar.gz
+*.tgz
+*.sql.gz
+*.sql.bak
+*.bak
+*.pem
+*.key
+*.p12
+*.pfx
+/backups/
+
+# Local credentials, agent settings and editor metadata
+/.aws/
+/.codex/
+/.agents/
+/.idea/
+/.vscode/
+.DS_Store
+Thumbs.db
+*.swp
+*.swo

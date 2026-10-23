@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="referrer" content="no-referrer">
+  <title>拾记 · 聊天式笔记</title>
+  <link rel="stylesheet" href="style/tabler.min.css">
+</head>
+<body>
+  <div class="container-lg px-0 px-md-3 py-md-4 vh-100" id="app">
+  <div class="row g-0 h-100 overflow-hidden bg-white rounded shadow-sm">
+    <aside id="sidebar" class="col-12 col-md-3 bg-white border-end d-flex flex-column p-3 h-100 overflow-hidden">
+      <header class="d-flex align-items-center gap-3 px-2 py-4"><span class="avatar bg-primary text-white">拾</span><div><strong class="h2 mb-0">拾记</strong><small class="d-block text-secondary">留住想法，随时拾起。</small></div></header>
+      <div class="d-flex justify-content-between align-items-center px-2 mb-2 text-secondary"><span>我的笔记</span><button class="btn btn-icon btn-ghost-secondary" id="add-group" title="新建分组" aria-label="新建分组" data-icon="plus"></button></div>
+      <nav class="nav nav-pills flex-column flex-fill overflow-y-auto overflow-x-hidden" id="groups" aria-label="笔记分组"></nav>
+      <button class="btn btn-outline-secondary my-3" id="new-group"><span data-icon="plus"></span>新建分组</button>
+      <footer class="border-top pt-3 d-flex align-items-center gap-2 text-secondary small"><span class="status-dot bg-success"></span>本地演示<span class="ms-auto">V1.2</span></footer>
+    </aside>
+    <main id="workspace" class="col-12 col-md-9 d-none d-md-flex flex-column h-100 overflow-hidden">
+      <header class="navbar bg-white border-bottom px-3 px-md-4 gap-2 flex-nowrap flex-shrink-0">
+        <button class="btn btn-icon btn-ghost-secondary d-md-none" id="back" aria-label="返回分组" data-icon="back"></button>
+        <div class="flex-fill overflow-hidden"><h1 class="h3 mb-1 text-break" id="group-title"></h1><span class="text-secondary small" id="group-description"></span></div>
+        <div class="d-flex align-items-center gap-3"><button class="btn btn-outline-secondary btn-sm" id="refresh"><span data-icon="refresh"></span><span class="d-none d-sm-inline">刷新</span></button><div class="dropdown"><button class="btn btn-ghost-secondary dropdown-toggle" id="user-menu" data-bs-toggle="dropdown" aria-expanded="false"><span class="avatar avatar-sm">L</span><span class="d-none d-sm-inline">管理员</span></button><div class="dropdown-menu dropdown-menu-end" id="account-menu"><button class="dropdown-item" data-account="devices">已登录设备</button><button class="dropdown-item" data-account="password">修改密码</button><button data-account="logout" class="dropdown-item text-danger">退出登录</button></div></div></div>
+      </header>
+      <div class="d-flex justify-content-between align-items-center px-3 px-md-4 py-2 text-secondary small"><span id="message-count"></span><div class="d-flex flex-wrap justify-content-end gap-2"><button class="btn btn-sm btn-ghost-secondary" id="anonymous-link" hidden><span data-icon="link"></span>生成匿名链接</button><button class="btn btn-sm btn-ghost-secondary" id="select-mode"><span data-icon="check"></span>选择消息</button><button class="btn btn-sm btn-ghost-secondary" id="group-settings" title="分组设置"><span data-icon="more"></span>分组设置</button></div></div>
+      <div class="bg-primary-lt px-3 py-2 d-flex justify-content-between align-items-center" id="selection-bar" hidden><span id="selected-count">已选择 0 条</span><div><button class="btn btn-sm btn-ghost-secondary" id="cancel-select">取消</button><button class="btn btn-sm btn-danger" id="delete-selected">删除所选</button></div></div>
+      <section class="chat-bubbles flex-fill overflow-auto px-3 px-md-4 py-3" id="messages" aria-label="笔记消息"></section>
+      <div class="bg-white border rounded p-3 m-3 mt-0 flex-shrink-0" id="composer"><div id="pending" class="d-flex flex-wrap gap-2"></div><textarea class="form-control border-0" id="message-input" placeholder="记录此刻的想法…" aria-label="消息内容" rows="3"></textarea><div class="d-flex align-items-center gap-2 mt-2"><button class="btn btn-sm btn-ghost-secondary" id="attach"><span data-icon="paperclip"></span>添加附件</button><span class="text-secondary small" id="attachment-count"></span><button class="btn btn-primary btn-sm ms-auto" id="send" disabled>发送<span data-icon="send"></span></button></div></div>
+    </main>
+  </div>
+  </div>
+  <section id="anonymous-page" class="d-none min-vh-100 d-flex align-items-center justify-content-center p-3" hidden></section>
+  <section id="login-page" class="d-none min-vh-100 d-flex align-items-center justify-content-center p-3" hidden><form class="col-12 col-md-6 col-lg-4 bg-white border rounded p-4" id="login-form"><span class="avatar bg-primary text-white">拾</span><h1 class="h2 mt-4">欢迎回到拾记</h1><p class="text-secondary">登录你的笔记空间</p><label class="form-label">用户名<input class="form-control mt-2" value="admin" required autocomplete="username"></label><label class="form-label mt-3">密码<input class="form-control mt-2" type="password" required autocomplete="current-password"></label><button class="btn btn-primary w-100 mt-3" type="submit">进入演示</button><small class="d-block text-secondary text-center mt-3">本地静态演示，不验证真实账号。</small></form></section>
+  <input type="file" id="file-input" multiple hidden accept=".jpg,.jpeg,.png,.gif,.webp,.pdf,.txt,.md,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.zip,.rar,.7z,.tar,.gz,.json,.csv,.xml,.log">
+  <div class="modal" id="modal" tabindex="-1" aria-hidden="true"><div class="modal-dialog modal-dialog-centered modal-dialog-scrollable"><div class="modal-content"><div class="modal-body" id="modal-content"></div></div></div></div>
+  <div id="toast" class="toast position-fixed bottom-0 start-50 translate-middle-x mb-4 bg-dark text-white p-3" role="status" aria-live="polite" aria-atomic="true"></div>
+  <script src="style/tabler.min.js"></script>
+  <script src="style/demo.js"></script>
+</body>
+</html>
